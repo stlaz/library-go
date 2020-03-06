@@ -22,6 +22,7 @@ import (
 func ApplyNamespace(client coreclientv1.NamespacesGetter, recorder events.Recorder, required *corev1.Namespace) (*corev1.Namespace, bool, error) {
 	existing, err := client.Namespaces().Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.Namespaces().Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err
@@ -53,6 +54,7 @@ func ApplyNamespace(client coreclientv1.NamespacesGetter, recorder events.Record
 func ApplyService(client coreclientv1.ServicesGetter, recorder events.Recorder, required *corev1.Service) (*corev1.Service, bool, error) {
 	existing, err := client.Services(required.Namespace).Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.Services(required.Namespace).Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err
@@ -94,6 +96,7 @@ func ApplyService(client coreclientv1.ServicesGetter, recorder events.Recorder, 
 func ApplyPod(client coreclientv1.PodsGetter, recorder events.Recorder, required *corev1.Pod) (*corev1.Pod, bool, error) {
 	existing, err := client.Pods(required.Namespace).Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.Pods(required.Namespace).Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err
@@ -123,6 +126,7 @@ func ApplyPod(client coreclientv1.PodsGetter, recorder events.Recorder, required
 func ApplyServiceAccount(client coreclientv1.ServiceAccountsGetter, recorder events.Recorder, required *corev1.ServiceAccount) (*corev1.ServiceAccount, bool, error) {
 	existing, err := client.ServiceAccounts(required.Namespace).Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.ServiceAccounts(required.Namespace).Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err
@@ -150,6 +154,7 @@ func ApplyServiceAccount(client coreclientv1.ServiceAccountsGetter, recorder eve
 func ApplyConfigMap(client coreclientv1.ConfigMapsGetter, recorder events.Recorder, required *corev1.ConfigMap) (*corev1.ConfigMap, bool, error) {
 	existing, err := client.ConfigMaps(required.Namespace).Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.ConfigMaps(required.Namespace).Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err
@@ -230,6 +235,7 @@ func ApplySecret(client coreclientv1.SecretsGetter, recorder events.Recorder, re
 
 	existing, err := client.Secrets(required.Namespace).Get(required.Name, metav1.GetOptions{})
 	if apierrors.IsNotFound(err) {
+		resourcemerge.CleanMetaLabelsAnnotations(&required.ObjectMeta)
 		actual, err := client.Secrets(required.Namespace).Create(required)
 		reportCreateEvent(recorder, required, err)
 		return actual, true, err

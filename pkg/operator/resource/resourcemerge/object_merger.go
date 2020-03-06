@@ -2,6 +2,7 @@ package resourcemerge
 
 import (
 	"reflect"
+	"strings"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -13,6 +14,21 @@ func EnsureObjectMeta(modified *bool, existing *metav1.ObjectMeta, required meta
 	SetStringIfSet(modified, &existing.Name, required.Name)
 	MergeMap(modified, &existing.Labels, required.Labels)
 	MergeMap(modified, &existing.Annotations, required.Annotations)
+}
+
+// CleanMetaLabelsAnnotations cleans the metadata off the removal annotations/labels
+// (those that end with trailing "-")
+func CleanMetaLabelsAnnotations(required *metav1.ObjectMeta) {
+	cleanRemovalKeys(&required.Annotations)
+	cleanRemovalKeys(&required.Labels)
+}
+
+func cleanRemovalKeys(required *map[string]string) {
+	for k := range *required {
+		if strings.HasSuffix(k, "-") {
+			delete(*required, k)
+		}
+	}
 }
 
 func stringPtr(val string) *string {
@@ -124,7 +140,13 @@ func MergeMap(modified *bool, existing *map[string]string, required map[string]s
 	for k, v := range required {
 		if existingV, ok := (*existing)[k]; !ok || v != existingV {
 			*modified = true
-			(*existing)[k] = v
+			// if "required" map contains a key with "-" as suffix, remove that
+			// key from the existing map instead of replacing the value
+			if strings.HasSuffix(k, "-") {
+				delete(*existing, strings.TrimRight(k, "-"))
+			} else {
+				(*existing)[k] = v
+			}
 		}
 	}
 }
