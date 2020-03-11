@@ -11,8 +11,8 @@ import (
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/deprecated/fake"
 	"k8s.io/client-go/informers"
-	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/openshift/library-go/pkg/operator/events"
 )
