@@ -14,7 +14,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	corev1client "k8s.io/client-go/deprecated/typed/core/v1"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/util/workqueue"
 
 	"github.com/openshift/library-go/pkg/controller/factory"
@@ -152,13 +152,13 @@ func (c *ResourceSyncController) Sync(ctx context.Context, syncCtx factory.SyncC
 	for destination, source := range c.configMapSyncRules {
 		if source == emptyResourceLocation {
 			// use the cache to check whether the configmap exists in target namespace, if not skip the extra delete call.
-			if _, err := c.configMapGetter.ConfigMaps(destination.Namespace).Get(destination.Name, metav1.GetOptions{}); err != nil {
+			if _, err := c.configMapGetter.ConfigMaps(destination.Namespace).Get(context.TODO(), destination.Name, metav1.GetOptions{}); err != nil {
 				if !apierrors.IsNotFound(err) {
 					errors = append(errors, err)
 				}
 				continue
 			}
-			if err := c.configMapGetter.ConfigMaps(destination.Namespace).Delete(destination.Name, nil); err != nil && !apierrors.IsNotFound(err) {
+			if err := c.configMapGetter.ConfigMaps(destination.Namespace).Delete(context.TODO(), destination.Name, metav1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 			continue
@@ -172,13 +172,13 @@ func (c *ResourceSyncController) Sync(ctx context.Context, syncCtx factory.SyncC
 	for destination, source := range c.secretSyncRules {
 		if source == emptyResourceLocation {
 			// use the cache to check whether the secret exists in target namespace, if not skip the extra delete call.
-			if _, err := c.secretGetter.Secrets(destination.Namespace).Get(destination.Name, metav1.GetOptions{}); err != nil {
+			if _, err := c.secretGetter.Secrets(destination.Namespace).Get(context.TODO(), destination.Name, metav1.GetOptions{}); err != nil {
 				if !apierrors.IsNotFound(err) {
 					errors = append(errors, err)
 				}
 				continue
 			}
-			if err := c.secretGetter.Secrets(destination.Namespace).Delete(destination.Name, nil); err != nil && !apierrors.IsNotFound(err) {
+			if err := c.secretGetter.Secrets(destination.Namespace).Delete(context.TODO(), destination.Name, metav1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
 				errors = append(errors, err)
 			}
 			continue

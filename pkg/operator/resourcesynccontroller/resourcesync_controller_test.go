@@ -19,7 +19,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
-	"k8s.io/client-go/deprecated/fake"
+	"k8s.io/client-go/kubernetes/fake"
 
 	operatorv1 "github.com/openshift/api/operator/v1"
 
@@ -234,10 +234,10 @@ func TestSyncConfigMap(t *testing.T) {
 	if err := c.Sync(context.TODO(), syncCtx); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := kubeClient.CoreV1().Secrets("operator").Get("foo", metav1.GetOptions{}); err != nil {
+	if _, err := kubeClient.CoreV1().Secrets("operator").Get(context.TODO(), "foo", metav1.GetOptions{}); err != nil {
 		t.Error(err)
 	}
-	if _, err := kubeClient.CoreV1().ConfigMaps("operator").Get("apple", metav1.GetOptions{}); err != nil {
+	if _, err := kubeClient.CoreV1().ConfigMaps("operator").Get(context.TODO(), "apple", metav1.GetOptions{}); err != nil {
 		t.Error(err)
 	}
 
@@ -252,10 +252,10 @@ func TestSyncConfigMap(t *testing.T) {
 	if err := c.Sync(context.TODO(), syncCtx); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := kubeClient.CoreV1().Secrets("operator").Get("foo", metav1.GetOptions{}); !apierrors.IsNotFound(err) {
+	if _, err := kubeClient.CoreV1().Secrets("operator").Get(context.TODO(), "foo", metav1.GetOptions{}); !apierrors.IsNotFound(err) {
 		t.Error(err)
 	}
-	if _, err := kubeClient.CoreV1().ConfigMaps("operator").Get("apple", metav1.GetOptions{}); !apierrors.IsNotFound(err) {
+	if _, err := kubeClient.CoreV1().ConfigMaps("operator").Get(context.TODO(), "apple", metav1.GetOptions{}); !apierrors.IsNotFound(err) {
 		t.Error(err)
 	}
 }
