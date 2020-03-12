@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -249,7 +250,7 @@ func (c *keyController) generateKeySecret(keyID uint64, currentMode state.Mode, 
 }
 
 func (c *keyController) getCurrentModeAndExternalReason() (state.Mode, string, error) {
-	apiServer, err := c.apiServerClient.Get("cluster", metav1.GetOptions{})
+	apiServer, err := c.apiServerClient.Get(context.TODO(), "cluster", metav1.GetOptions{})
 	if err != nil {
 		return "", "", err
 	}
