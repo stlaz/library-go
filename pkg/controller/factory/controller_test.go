@@ -11,8 +11,8 @@ import (
 	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/client-go/deprecated/fake"
 	"k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes/fake"
 
 	"github.com/openshift/library-go/pkg/operator/events"
 )
@@ -131,7 +131,7 @@ func TestControllerWithInformer(t *testing.T) {
 	go controller.Run(ctx, 1)
 	time.Sleep(1 * time.Second) // Give controller time to start
 
-	if _, err := kubeClient.CoreV1().Secrets("test").Create(makeFakeSecret()); err != nil {
+	if _, err := kubeClient.CoreV1().Secrets("test").Create(context.TODO(), makeFakeSecret(), meta.CreateOptions{}); err != nil {
 		t.Fatalf("failed to create fake secret: %v", err)
 	}
 
@@ -175,7 +175,7 @@ func TestControllerWithQueueFunction(t *testing.T) {
 	go controller.Run(ctx, 1)
 	time.Sleep(1 * time.Second) // Give controller time to start
 
-	if _, err := kubeClient.CoreV1().Secrets("test").Create(makeFakeSecret()); err != nil {
+	if _, err := kubeClient.CoreV1().Secrets("test").Create(context.TODO(), makeFakeSecret(), meta.CreateOptions{}); err != nil {
 		t.Fatalf("failed to create fake secret: %v", err)
 	}
 

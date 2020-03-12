@@ -7,13 +7,14 @@ import (
 	"sort"
 	"time"
 
+	"golang.org/x/net/context"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
-	corev1client "k8s.io/client-go/deprecated/typed/core/v1"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/retry"
 	"k8s.io/client-go/util/workqueue"
@@ -249,7 +250,7 @@ func (c *migrationController) migrateKeysIfNeededAndRevisionStable() (migratingR
 			continue
 		}
 		if err := retry.RetryOnConflict(retry.DefaultBackoff, func() error {
-			s, err := c.secretClient.Secrets(oldWriteKey.Namespace).Get(oldWriteKey.Name, metav1.GetOptions{})
+			s, err := c.secretClient.Secrets(oldWriteKey.Namespace).Get(context.TODO(), oldWriteKey.Name, metav1.GetOptions{})
 			if err != nil {
 				return fmt.Errorf("failed to get key secret %s/%s: %v", oldWriteKey.Namespace, oldWriteKey.Name, err)
 			}

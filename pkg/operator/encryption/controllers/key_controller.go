@@ -17,7 +17,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	kyaml "k8s.io/apimachinery/pkg/util/yaml"
 	apiserverv1 "k8s.io/apiserver/pkg/apis/config/v1"
-	corev1client "k8s.io/client-go/deprecated/typed/core/v1"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
@@ -202,7 +202,7 @@ func (c *keyController) checkAndCreateKeys() error {
 	if err != nil {
 		return fmt.Errorf("failed to create key: %v", err)
 	}
-	_, createErr := c.secretClient.Secrets("openshift-config-managed").Create(keySecret)
+	_, createErr := c.secretClient.Secrets("openshift-config-managed").Create(context.TODO(), keySecret, metav1.CreateOptions{})
 	if errors.IsAlreadyExists(createErr) {
 		return c.validateExistingSecret(keySecret, newKeyID)
 	}
@@ -217,7 +217,7 @@ func (c *keyController) checkAndCreateKeys() error {
 }
 
 func (c *keyController) validateExistingSecret(keySecret *corev1.Secret, keyID uint64) error {
-	actualKeySecret, err := c.secretClient.Secrets("openshift-config-managed").Get(keySecret.Name, metav1.GetOptions{})
+	actualKeySecret, err := c.secretClient.Secrets("openshift-config-managed").Get(context.TODO(), keySecret.Name, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}

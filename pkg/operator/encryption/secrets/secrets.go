@@ -1,6 +1,7 @@
 package secrets
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apiserverconfigv1 "k8s.io/apiserver/pkg/apis/config/v1"
-	corev1client "k8s.io/client-go/deprecated/typed/core/v1"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	"github.com/openshift/library-go/pkg/operator/encryption/state"
 )
@@ -126,7 +127,7 @@ func (m *MigratedGroupResources) HasResource(resource schema.GroupResource) bool
 
 // ListKeySecrets returns the current key secrets from openshift-config-managed.
 func ListKeySecrets(secretClient corev1client.SecretsGetter, encryptionSecretSelector metav1.ListOptions) ([]*corev1.Secret, error) {
-	encryptionSecretList, err := secretClient.Secrets("openshift-config-managed").List(encryptionSecretSelector)
+	encryptionSecretList, err := secretClient.Secrets("openshift-config-managed").List(context.TODO(), encryptionSecretSelector)
 	if err != nil {
 		return nil, err
 	}
