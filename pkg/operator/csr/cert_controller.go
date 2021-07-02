@@ -284,6 +284,13 @@ func (c *clientCertificateController) createCSR(ctx context.Context) (string, er
 		},
 	}
 
+	// prevent CSR creation failure on static CSR names
+	if csrStaticName := c.ObjectMeta.Name; len(csrStaticName) > 0 {
+		if err := c.hubCSRClient.Delete(ctx, csrStaticName, metav1.DeleteOptions{}); err != nil && !errors.IsNotFound(err) {
+			return "", err
+		}
+	}
+
 	req, err := c.hubCSRClient.Create(ctx, csr, metav1.CreateOptions{})
 	if err != nil {
 		return "", err
